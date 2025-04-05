@@ -1,0 +1,56 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\vladi\\Desktop\\Letter(Laba)\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{01C640DD-0985-4692-8D17-2C6A77333A15}|Letter(Laba)\\Letter(Laba).csproj|c:\\users\\vladi\\desktop\\letter(laba)\\letter(laba)\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{01C640DD-0985-4692-8D17-2C6A77333A15}|Letter(Laba)\\Letter(Laba).csproj|solutionrelative:letter(laba)\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{01C640DD-0985-4692-8D17-2C6A77333A15}|Letter(Laba)\\Letter(Laba).csproj|C:\\Users\\vladi\\Desktop\\Letter(Laba)\\letter(laba)\\mainwindow.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|",
+      "RelativeMoniker": "D:0:0:{01C640DD-0985-4692-8D17-2C6A77333A15}|Letter(Laba)\\Letter(Laba).csproj|solutionrelative:letter(laba)\\mainwindow.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\vladi\\Desktop\\Letter(Laba)\\Letter(Laba)\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "Letter(Laba)\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\vladi\\Desktop\\Letter(Laba)\\Letter(Laba)\\MainWindow.xaml.cs",
+              "RelativeToolTip": "Letter(Laba)\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAIkAAAAAAAAAAAAYwKAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-20T18:28:32.362Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\vladi\\Desktop\\Letter(Laba)\\Letter(Laba)\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "Letter(Laba)\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\vladi\\Desktop\\Letter(Laba)\\Letter(Laba)\\MainWindow.xaml",
+              "RelativeToolTip": "Letter(Laba)\\MainWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-03-20T18:24:45.307Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+﻿<Window x:Class="Letter_Laba_.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Генератор писем" Height="700" Width="500">
+    <Grid Margin="10">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Name="MainStackPanel" Orientation="Vertical">
+                <!-- Поля ввода -->
+                <TextBlock Text="Почта:" Margin="0,5,0,0"/>
+                <Grid>
+                    <TextBox Name="txtAddress" Margin="0,0,30,0"/>
+                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" Click="ClearField_Click" Tag="txtAddress"/>
+                </Grid>
+
+                <TextBlock Text="Пол адресата:" Margin="0,5,0,0"/>
+                <ComboBox Name="cmbGender" SelectedIndex="0" HorizontalAlignment="Stretch">
+                    <ComboBoxItem>Мужчина</ComboBoxItem>
+                    <ComboBoxItem>Женщина</ComboBoxItem>
+                </ComboBox>
+
+                <TextBlock Text="Должность адресата:" Margin="0,5,0,0"/>
+                <Grid>
+                    <TextBox Name="txtRecipientPost" Margin="0,0,30,0"/>
+                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" Click="ClearField_Click" Tag="txtRecipientPost"/>
+                </Grid>
+
+                <TextBlock Text="Адресат:" Margin="0,5,0,0"/>
+                <Grid>
+                    <TextBox Name="txtRecipient" Margin="0,0,30,0"/>
+                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" Click="ClearField_Click" Tag="txtRecipient"/>
+                </Grid>
+
+                <TextBlock Text="Тема письма:" Margin="0,5,0,0"/>
+                <Grid>
+                    <TextBox Name="txtSubject" Margin="0,0,30,0"/>
+                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" Click="ClearField_Click" Tag="txtSubject"/>
+                </Grid>
+
+                <TextBlock Text="Текст письма:" Margin="0,5,0,0"/>
+                <Grid>
+                    <TextBox Name="txtBody" Height="80" AcceptsReturn="True" TextWrapping="Wrap" Margin="0,0,30,0"/>
+                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" VerticalAlignment="Top" Click="ClearField_Click" Tag="txtBody"/>
+                </Grid>
+
+                <TextBlock Text="ФИО:" Margin="0,5,0,0"/>
+                <Grid>
+                    <TextBox Name="txtFullName" Margin="0,0,30,0"/>
+                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" Click="ClearField_Click" Tag="txtFullName"/>
+                </Grid>
+
+                <TextBlock Text="Должность:" Margin="0,5,0,0"/>
+                <Grid>
+                    <TextBox Name="txtPosition" Margin="0,0,30,0"/>
+                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" Click="ClearField_Click" Tag="txtPosition"/>
+                </Grid>
+
+                <!-- Приложения -->
+                <TextBlock Text="Приложения:" Margin="10,10,0,0" FontWeight="Bold"/>
+                <StackPanel Name="AttachmentPanel" />
+
+                <!-- Кнопки -->
+                <Button Content="Добавить приложение" Margin="0,10,0,0" Click="AddAttachment_Click"/>
+                <Button Content="Создать документ" Margin="0,10,0,0" Click="Button_Click"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
