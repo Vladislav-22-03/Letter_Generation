@@ -1,67 +1,113 @@
 ﻿<Window x:Class="Letter_Laba_.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Генератор писем" Height="700" Width="500">
-    <Grid Margin="10">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Name="MainStackPanel" Orientation="Vertical">
-                <!-- Поля ввода -->
-                <TextBlock Text="Почта:" Margin="0,5,0,0"/>
-                <Grid>
-                    <TextBox Name="txtAddress" Margin="0,0,30,0"/>
-                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" Click="ClearField_Click" Tag="txtAddress"/>
-                </Grid>
+        Title="Генератор письма"
+        Height="700"
+        Width="500"
+        ResizeMode="CanResize"
+        WindowStyle="SingleBorderWindow"
+        WindowStartupLocation="CenterScreen">
 
-                <TextBlock Text="Пол адресата:" Margin="0,5,0,0"/>
-                <ComboBox Name="cmbGender" SelectedIndex="0" HorizontalAlignment="Stretch">
-                    <ComboBoxItem>Мужчина</ComboBoxItem>
-                    <ComboBoxItem>Женщина</ComboBoxItem>
-                </ComboBox>
+    <Window.Resources>
+        <Style x:Key="WatermarkTextBox" TargetType="TextBox">
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="5,2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Background="{TemplateBinding Background}">
+                            <Grid>
+                                <ScrollViewer x:Name="PART_ContentHost" />
+                                <TextBlock x:Name="watermark"
+                                   Text="{TemplateBinding Tag}"
+                                   Foreground="Gray"
+                                   Margin="5,0,0,0"
+                                   VerticalAlignment="Center"
+                                   IsHitTestVisible="False"
+                                   Visibility="Collapsed"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Text" Value="">
+                                <Setter TargetName="watermark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="watermark" Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-                <TextBlock Text="Должность адресата:" Margin="0,5,0,0"/>
-                <Grid>
-                    <TextBox Name="txtRecipientPost" Margin="0,0,30,0"/>
-                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" Click="ClearField_Click" Tag="txtRecipientPost"/>
-                </Grid>
+    </Window.Resources>
 
-                <TextBlock Text="Адресат:" Margin="0,5,0,0"/>
-                <Grid>
-                    <TextBox Name="txtRecipient" Margin="0,0,30,0"/>
-                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" Click="ClearField_Click" Tag="txtRecipient"/>
-                </Grid>
-
-                <TextBlock Text="Тема письма:" Margin="0,5,0,0"/>
-                <Grid>
-                    <TextBox Name="txtSubject" Margin="0,0,30,0"/>
-                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" Click="ClearField_Click" Tag="txtSubject"/>
-                </Grid>
-
-                <TextBlock Text="Текст письма:" Margin="0,5,0,0"/>
-                <Grid>
-                    <TextBox Name="txtBody" Height="80" AcceptsReturn="True" TextWrapping="Wrap" Margin="0,0,30,0"/>
-                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" VerticalAlignment="Top" Click="ClearField_Click" Tag="txtBody"/>
-                </Grid>
-
-                <TextBlock Text="ФИО:" Margin="0,5,0,0"/>
-                <Grid>
-                    <TextBox Name="txtFullName" Margin="0,0,30,0"/>
-                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" Click="ClearField_Click" Tag="txtFullName"/>
-                </Grid>
-
-                <TextBlock Text="Должность:" Margin="0,5,0,0"/>
-                <Grid>
-                    <TextBox Name="txtPosition" Margin="0,0,30,0"/>
-                    <Button Content="🗑" Width="25" HorizontalAlignment="Right" Click="ClearField_Click" Tag="txtPosition"/>
-                </Grid>
-
-                <!-- Приложения -->
-                <TextBlock Text="Приложения:" Margin="10,10,0,0" FontWeight="Bold"/>
-                <StackPanel Name="AttachmentPanel" />
-
-                <!-- Кнопки -->
-                <Button Content="Добавить приложение" Margin="0,10,0,0" Click="AddAttachment_Click"/>
-                <Button Content="Создать документ" Margin="0,10,0,0" Click="Button_Click"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20">
+            <TextBlock Text="ФИО отправителя:" Margin="0,5,0,0"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBox Style="{StaticResource WatermarkTextBox}" Tag="Введите Фамилию и инициалы" Name="txtFullName" Width="400"/>
+                <Button Content="🗑" Width="30" Margin="5,0,0,0" Click="ClearTextBox_Click" Tag="txtFullName"/>
             </StackPanel>
-        </ScrollViewer>
-    </Grid>
+
+            <TextBlock Text="Должность отправителя:" Margin="0,5,0,0"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBox Style="{StaticResource WatermarkTextBox}" Tag="Введите должность" Name="txtPosition" Width="400"/>
+                <Button Content="🗑" Width="30" Margin="5,0,0,0" Click="ClearTextBox_Click" Tag="txtPosition"/>
+            </StackPanel>
+
+            <TextBlock Text="Почта получателя:" Margin="0,5,0,0"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBox Style="{StaticResource WatermarkTextBox}" Tag="Введите почтовый адрес" Name="txtAddress" Width="400"/>
+                <Button Content="🗑" Width="30" Margin="5,0,0,0" Click="ClearTextBox_Click" Tag="txtAddress"/>
+            </StackPanel>
+
+            <TextBlock Text="Пол адресата:" Margin="0,5,0,0"/>
+            <ComboBox Name="cmbGender" Margin="0,0,0,5">
+                <ComboBoxItem Content="Мужской" />
+                <ComboBoxItem Content="Женский" />
+            </ComboBox>
+
+            <TextBlock Text="ФИО адресата:" Margin="0,5,0,0"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBox Style="{StaticResource WatermarkTextBox}" Tag="Введите Фамилию и инициалы" Name="txtRecipient" Width="400"/>
+                <Button Content="🗑" Width="30" Margin="5,0,0,0" Click="ClearTextBox_Click" Tag="txtRecipient"/>
+            </StackPanel>
+
+            <TextBlock Text="Должность адресата:" Margin="0,5,0,0"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBox Style="{StaticResource WatermarkTextBox}" Tag="Введите должность адресата" Name="txtRecipientPost" Width="400"/>
+                <Button Content="🗑" Width="30" Margin="5,0,0,0" Click="ClearTextBox_Click" Tag="txtRecipientPost"/>
+            </StackPanel>
+
+            <TextBlock Text="Тема письма:" Margin="0,5,0,0"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBox Style="{StaticResource WatermarkTextBox}" Tag="Введите тему письма" Name="txtSubject" Width="400"/>
+                <Button Content="🗑" Width="30" Margin="5,0,0,0" Click="ClearTextBox_Click" Tag="txtSubject"/>
+            </StackPanel>
+
+            <TextBlock Text="Текст письма:" Margin="0,5,0,0"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBox Style="{StaticResource WatermarkTextBox}"
+                 Tag="Введите текст письма"
+                 Name="txtBody"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 Height="100"
+                 VerticalScrollBarVisibility="Auto"
+                 Width="400"/>
+                <Button Content="🗑" Width="30" Height="100" Margin="5,0,0,0" Click="ClearTextBox_Click" Tag="txtBody"/>
+            </StackPanel>
+
+            <TextBlock Text="Приложения:" FontWeight="Bold" Margin="0,10,0,0"/>
+            <StackPanel Name="AttachmentPanel" />
+
+            <Button Content="Добавить приложение" Click="AddAttachment_Click" Margin="0,5"/>
+            <Button Content="Создать документ" Click="Button_Click" Margin="0,10"/>
+        </StackPanel>
+
+    </ScrollViewer>
 </Window>

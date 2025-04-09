@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 
@@ -11,7 +12,7 @@ namespace Letter_Laba_
 {
     public partial class MainWindow : Window
     {
-        private List<TextBox> attachmentTextBoxes = new List<TextBox>(); // Список полей для приложений
+        private List<Tuple<TextBox, TextBox>> attachments = new List<Tuple<TextBox, TextBox>>();
 
         public MainWindow()
         {
@@ -20,138 +21,218 @@ namespace Letter_Laba_
 
         private void AddAttachment_Click(object sender, RoutedEventArgs e)
         {
-            // Создаем новое поле для приложения
-            TextBox newAttachment = new TextBox
+            // Контейнер всего приложения
+            StackPanel appContainer = new StackPanel
             {
-                Height = 60,
-                AcceptsReturn = true,
-                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 5, 0, 5),
+                Orientation = Orientation.Vertical
+            };
+
+            // Название приложения — текст + мусорка
+            TextBlock titleLabel = new TextBlock
+            {
+                Text = "Название приложения:",
                 Margin = new Thickness(0, 5, 0, 0)
             };
 
-            // Добавляем в список и UI
-            attachmentTextBoxes.Add(newAttachment);
-            AttachmentPanel.Children.Add(newAttachment);
+            TextBox titleBox = new TextBox
+            {
+                Height = 25,
+                Width = 350,
+                Margin = new Thickness(0, 0, 5, 0),
+                Tag = "Введите название приложения"
+            };
+
+            // Очистка названия
+            Button clearTitleBtn = new Button
+            {
+                Content = "🗑",
+                Width = 30,
+                Margin = new Thickness(5, 0, 0, 0),
+                Tag = titleBox
+            };
+            clearTitleBtn.Click += (s, ev) => titleBox.Text = "";
+
+            // Горизонтальный контейнер для названия + мусорки
+            StackPanel titlePanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal
+            };
+            titlePanel.Children.Add(titleBox);
+            titlePanel.Children.Add(clearTitleBtn);
+
+            // Текст приложения — текст + мусорка
+            TextBlock contentLabel = new TextBlock
+            {
+                Text = "Текст приложения:",
+                Margin = new Thickness(0, 5, 0, 0)
+            };
+
+            TextBox contentBox = new TextBox
+            {
+                Height = 60,
+                Width = 350,
+                Margin = new Thickness(0, 0, 5, 0),
+                TextWrapping = TextWrapping.Wrap,
+                AcceptsReturn = true,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Tag = "Введите текст приложения"
+            };
+
+            // Очистка текста приложения
+            Button clearContentBtn = new Button
+            {
+                Content = "🗑",
+                Width = 30,
+                Margin = new Thickness(5, 0, 0, 0),
+                Tag = contentBox
+            };
+            clearContentBtn.Click += (s, ev) => contentBox.Text = "";
+
+            // Горизонтальный контейнер для текста + мусорки
+            StackPanel contentPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal
+            };
+            contentPanel.Children.Add(contentBox);
+            contentPanel.Children.Add(clearContentBtn);
+
+            // Кнопка удаления всего приложения
+            Button removeAttachmentBtn = new Button
+            {
+                Content = "Удалить приложение",
+                Margin = new Thickness(0, 5, 0, 0),
+                Background = Brushes.LightCoral
+            };
+            removeAttachmentBtn.Click += (s, ev) =>
+            {
+                AttachmentPanel.Children.Remove(appContainer);
+                attachments.RemoveAll(t => t.Item1 == titleBox && t.Item2 == contentBox);
+            };
+
+            // Собираем всё вместе
+            appContainer.Children.Add(titleLabel);
+            appContainer.Children.Add(titlePanel);
+            appContainer.Children.Add(contentLabel);
+            appContainer.Children.Add(contentPanel);
+            appContainer.Children.Add(removeAttachmentBtn);
+
+            AttachmentPanel.Children.Add(appContainer);
+
+            // Добавляем в список для вставки в документ
+            attachments.Add(new Tuple<TextBox, TextBox>(titleBox, contentBox));
         }
 
+
+
+
+
         private void ReplacePlaceholders(string sourceFilePath, string destinationFilePath)
-{
-    File.Copy(sourceFilePath, destinationFilePath, true);
+        {
+            File.Copy(sourceFilePath, destinationFilePath, true);
 
-    using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(destinationFilePath, true))
-    {
-        var body = wordDoc.MainDocumentPart.Document.Body;
-        int replacements = 0;
+            using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(destinationFilePath, true))
+            {
+                var body = wordDoc.MainDocumentPart.Document.Body;
+                int replacements = 0;
+                string greeting = cmbGender.SelectedIndex == 0 ? "Уважаемый " : "Уважаемая ";
 
-        string greeting = cmbGender.SelectedIndex == 0 ? "Уважаемый " : "Уважаемая ";
-
-                // Заменяем обычные плейсхолдеры
-                foreach (var paragraph in body.Descendants<Paragraph>())
+                foreach (var paragraph in body.Descendants<Paragraph>().ToList())
                 {
-                    var textElement = paragraph.Descendants<Text>().FirstOrDefault(t => t.Text.Contains("[Приложение]"));
-                    if (textElement != null)
+                    foreach (var text in paragraph.Descendants<Text>().ToList())
                     {
-                        paragraph.RemoveAllChildren<Run>(); // Удаляем старый текст
-
-                        // Создаем новый параграф для списка приложений
-                        Paragraph applicationListParagraph = new Paragraph(
-                            new ParagraphProperties(new Justification() { Val = JustificationValues.Left }),
-                            new Run(new RunProperties(new Bold()), new Text("Приложения:")),
-                            new Run(new Break()) // Разрыв строки после "Приложения:"
-                        );
-
-                        for (int i = 0; i < attachmentTextBoxes.Count; i++)
+                        if (text.Text.Contains("[Текст письма]"))
                         {
-                            applicationListParagraph.Append(
-                                new Run(new Text($"{i + 1}. Приложение {i + 1} (на странице {2 + i})")),
-                                new Run(new Break()) // Разрыв строки после каждой записи
-                            );
+                            var parentParagraph = text.Ancestors<Paragraph>().FirstOrDefault();
+                            if (parentParagraph != null)
+                            {
+                                parentParagraph.RemoveAllChildren<Run>();
+
+                                // Добавляем текст письма построчно
+                                foreach (var line in txtBody.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None))
+                                {
+                                    parentParagraph.AppendChild(new Run(new Text(line)));
+                                    parentParagraph.AppendChild(new Run(new Break()));
+                                }
+
+                                // Добавляем список приложений сразу после текста письма
+                                if (attachments.Count > 0)
+                                {
+                                    parentParagraph.AppendChild(new Run(new Break()));
+                                    parentParagraph.AppendChild(new Run(new Text("Приложения:")));
+                                    parentParagraph.AppendChild(new Run(new Break()));
+
+                                    for (int i = 0; i < attachments.Count; i++)
+                                    {
+                                        string title = attachments[i].Item1.Text;
+                                        parentParagraph.AppendChild(new Run(new Text($"{i + 1}. {title} (на странице {2 + i})")));
+                                        parentParagraph.AppendChild(new Run(new Break()));
+                                    }
+                                }
+
+                                replacements++;
+                            }
                         }
-
-                        // Вставляем **НОВЫЙ** экземпляр списка
-                        paragraph.Append(applicationListParagraph.Elements<Run>().Select(run => new Run(run.OuterXml)));
-
-                        replacements++;
-                        break;
+                        else
+                        {
+                            // Простая замена остальных плейсхолдеров
+                            text.Text = text.Text
+                                .Replace("[Почта]", txtAddress.Text)
+                                .Replace("[Адресат1]", txtRecipient.Text)
+                                .Replace("[Должность адресата]", greeting + txtRecipientPost.Text)
+                                .Replace("[Адресат]", greeting + txtRecipient.Text)
+                                .Replace("[Тема письма]", txtSubject.Text)
+                                .Replace("[ФИО]", txtFullName.Text)
+                                .Replace("[Должность]", txtPosition.Text)
+                                .Replace("[Дата]", DateTime.Now.ToShortDateString());
+                        }
                     }
                 }
 
-
-                // Проверяем, есть ли приложения
-                if (attachmentTextBoxes.Count > 0)
-        {
-            int startPage = 2; // Первая страница с приложениями начинается со 2-й
-
-            // Создаем параграф для списка приложений
-            Paragraph applicationListParagraph = new Paragraph(
-                new ParagraphProperties(new Justification() { Val = JustificationValues.Left }),
-                new Run(new RunProperties(new Bold()), new Text("Приложения:")),
-                new Run(new Break()) // Разрыв строки после "Приложения:"
-            );
-
-            for (int i = 0; i < attachmentTextBoxes.Count; i++)
-            {
-                applicationListParagraph.Append(
-                    new Run(new Text($"{i + 1}. Приложение {i + 1} (на странице {startPage})")),
-                    new Run(new Break()) // Разрыв строки после каждой записи
-                );
-                startPage++;
-            }
-
-            // Заменяем [Приложение] на список
-            foreach (var paragraph in body.Descendants<Paragraph>())
-            {
-                var textElement = paragraph.Descendants<Text>().FirstOrDefault(t => t.Text.Contains("[Приложение]"));
-                if (textElement != null)
+                // Добавляем приложения на отдельные страницы
+                if (attachments.Count > 0)
                 {
-                    paragraph.RemoveAllChildren<Run>(); // Очищаем старый текст
-                    paragraph.Append(applicationListParagraph.Elements<Run>());
-                    replacements++;
-                    break;
+                    for (int i = 0; i < attachments.Count; i++)
+                    {
+                        body.AppendChild(new Paragraph(new Run(new Break() { Type = BreakValues.Page })));
+
+                        body.AppendChild(new Paragraph(
+                            new ParagraphProperties(new Justification() { Val = JustificationValues.Right }),
+                            new Run(new RunProperties(new Bold()), new Text($"Приложение {i + 1}"))
+                        ));
+
+                        body.AppendChild(new Paragraph(
+                            new ParagraphProperties(new Justification() { Val = JustificationValues.Center }),
+                            new Run(new RunProperties(new Bold()), new Text(attachments[i].Item1.Text))
+                        ));
+
+                        body.AppendChild(new Paragraph(
+                            new ParagraphProperties(new Justification() { Val = JustificationValues.Left }),
+                            new Run(new Text(attachments[i].Item2.Text))
+                        ));
+                    }
+                }
+
+                if (replacements > 0)
+                {
+                    wordDoc.MainDocumentPart.Document.Save();
+                }
+                else
+                {
+                    MessageBox.Show("Плейсхолдеры не найдены. Проверьте шаблон.");
                 }
             }
+        }
 
-            // Добавляем каждое приложение на новую страницу
-            for (int i = 0; i < attachmentTextBoxes.Count; i++)
+
+
+        private void ClearTextBox_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            if (button != null && button.Tag is string)
             {
-                body.AppendChild(new Paragraph(new Run(new Break() { Type = BreakValues.Page })));
-
-                // Заголовок "Приложение X" (справа)
-                body.AppendChild(new Paragraph(
-                    new ParagraphProperties(new Justification() { Val = JustificationValues.Right }),
-                    new Run(new RunProperties(new Bold()), new Text($"Приложение {i + 1}"))
-                ));
-
-                // Заголовок "ПРИЛОЖЕНИЕ" (по центру)
-                body.AppendChild(new Paragraph(
-                    new ParagraphProperties(new Justification() { Val = JustificationValues.Center }),
-                    new Run(new RunProperties(new Bold()), new Text("ПРИЛОЖЕНИЕ"))
-                ));
-
-                // Текст приложения (слева)
-                body.AppendChild(new Paragraph(
-                    new ParagraphProperties(new Justification() { Val = JustificationValues.Left }),
-                    new Run(new Text(attachmentTextBoxes[i].Text))
-                ));
-            }
-        }
-
-        if (replacements > 0)
-        {
-            wordDoc.MainDocumentPart.Document.Save();
-        }
-        else
-        {
-            MessageBox.Show("Ни один плейсхолдер не найден. Проверьте шаблон.");
-        }
-    }
-}
-
-        private void ClearField_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button button && button.Tag is string textBoxName)
-            {
-                var field = this.FindName(textBoxName) as TextBox;
+                string textBoxName = button.Tag.ToString();
+                TextBox field = this.FindName(textBoxName) as TextBox;
                 if (field != null)
                 {
                     field.Text = string.Empty;
@@ -159,21 +240,28 @@ namespace Letter_Laba_
             }
         }
 
-        private void ClearText_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is string targetName)
-            {
-                var textBox = FindName(targetName) as TextBox;
-                if (textBox != null)
-                {
-                    textBox.Clear();
-                }
-            }
-        }
-
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            // Проверка на незаполненные поля
+            List<string> emptyFields = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(txtAddress.Text)) emptyFields.Add("Почта");
+            if (string.IsNullOrWhiteSpace(txtRecipient.Text)) emptyFields.Add("Адресат");
+            if (string.IsNullOrWhiteSpace(txtRecipientPost.Text)) emptyFields.Add("Должность адресата");
+            if (string.IsNullOrWhiteSpace(txtSubject.Text)) emptyFields.Add("Тема письма");
+            if (string.IsNullOrWhiteSpace(txtBody.Text)) emptyFields.Add("Текст письма");
+            if (string.IsNullOrWhiteSpace(txtFullName.Text)) emptyFields.Add("ФИО");
+            if (string.IsNullOrWhiteSpace(txtPosition.Text)) emptyFields.Add("Должность");
+            if (cmbGender.SelectedIndex == -1) emptyFields.Add("Пол");
+
+            if (emptyFields.Count > 0)
+            {
+                string message = "Пожалуйста, заполните следующие поля:\n\n" + string.Join("\n", emptyFields);
+                MessageBox.Show(message, "Не заполнены поля", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Путь к шаблону
             string sourceFilePath = @"C:\Users\vladi\Desktop\Лаба1.docx";
 
             if (!File.Exists(sourceFilePath))
@@ -182,6 +270,7 @@ namespace Letter_Laba_
                 return;
             }
 
+            // Диалог сохранения
             var saveFileDialog = new Microsoft.Win32.SaveFileDialog
             {
                 Filter = "Word Documents|*.docx",
@@ -205,7 +294,7 @@ namespace Letter_Laba_
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка при обновлении документа: {ex.Message}");
+                    MessageBox.Show("Ошибка при создании документа: " + ex.Message);
                 }
             }
         }
